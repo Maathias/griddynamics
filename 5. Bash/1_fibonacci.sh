@@ -9,3 +9,14 @@
 #   if n > 1, it should return Fn-1 + Fn-2
 #
 
+fib() {
+  if [ $1 -eq 0 ]; then
+    echo 0
+  elif [ $1 -eq 1 ]; then
+    echo 1
+  else
+    echo $(( $(fib $(( $1 - 1 ))) + $(fib $(( $1 - 2 ))) ))
+  fi
+}
+
+fib $1

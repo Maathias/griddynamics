@@ -5,3 +5,14 @@
 #   If the number is a multiple of both 3 and 5, you need to print "FizzBuzz" instead of that number.
 #
 
+for i in {1..100}; do
+	if ((i % 3 == 0)) && ((i % 5 == 0)); then
+		echo "FizzBuzz"
+	elif ((i % 3 == 0)); then
+		echo "Fizz"
+	elif ((i % 5 == 0)); then
+		echo "Buzz"
+	else
+		echo $i
+	fi
+done
