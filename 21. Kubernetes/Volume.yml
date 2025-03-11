@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: send-pvc
+  namespace: send
+spec:
+  storageClassName: apps-vol
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2.5Gi

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: send
+  namespace: send
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: send
+  template:
+    metadata:
+      labels:
+        app: send
+    spec:
+      nodeSelector:
+        topology.kubernetes.io/region: vanaheim
+      initContainers:
+        - name: volume-permissions
+          image: busybox
+          command: ['sh', '-c', 'chown -R 1000:1000 /uploads']
+          volumeMounts:
+            - name: data
+              mountPath: /uploads
+              subPath: uploads
+      containers:
+        - name: send
+          image: registry.gitlab.com/timvisee/send:v3.4.23
+          ports:
+            - containerPort: 1234
+          volumeMounts:
+            - name: data
+              mountPath: /uploads
+              subPath: uploads
+          env:
+            - name: VIRTUAL_HOST
+              value: send.mtps.pl
+            - name: VIRTUAL_PORT
+              value: '1234'
+            - name: DHPARAM_GENERATION
+              value: 'false'
+            - name: NODE_ENV
+              value: production
+            - name: BASE_URL
+              value: https://send.mtps.pl
+            - name: PORT
+              value: '1234'
+            - name: REDIS_HOST
+              value: localhost
+            - name: FILE_DIR
+              value: /uploads
+          resources:
+            limits:
+              memory: '768Mi'
+              cpu: '1'
+            requests:
+              memory: '256Mi'
+              cpu: '250m'
+        - name: redis
+          image: redis:7-bookworm
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: redis
+          resources:
+            limits:
+              memory: '256Mi'
+              cpu: '250m'
+            requests:
+              memory: '128Mi'
+              cpu: '125m'
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: send-pvc
